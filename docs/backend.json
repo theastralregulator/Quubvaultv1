@@ -1,0 +1,118 @@
+
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Information about a Quub user (Worker, Employer, or both).",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "bio": { "type": "string" },
+        "skills": { "type": "array", "items": { "type": "string" } },
+        "userType": { "type": "string", "enum": ["worker", "employer", "both"] },
+        "role": { "type": "string", "enum": ["user", "admin"], "default": "user" },
+        "accountType": { "type": "string", "enum": ["standard", "silver", "gold"], "default": "standard" },
+        "isVerified": { "type": "boolean", "default": false },
+        "isBanned": { "type": "boolean", "default": false },
+        "location": { "type": "string" },
+        "avatarUrl": { "type": "string" },
+        "rating": { "type": "number" },
+        "reviewsCount": { "type": "number" },
+        "availabilityStatus": { "type": "string", "enum": ["available", "busy"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "userType"]
+    },
+    "Job": {
+      "title": "Job",
+      "description": "A work opportunity posted by an employer. Publicly readable.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "budget": { "type": "string" },
+        "skills": { "type": "array", "items": { "type": "string" } },
+        "deadline": { "type": "string" },
+        "postedBy": { "type": "string" },
+        "employerName": { "type": "string" },
+        "location": { "type": "string" },
+        "category": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"], "default": "pending" },
+        "type": { "type": "string", "enum": ["remote", "onsite", "hybrid"] },
+        "isUrgent": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "budget", "postedBy"]
+    },
+    "Application": {
+      "title": "Application",
+      "description": "A worker's application for a job posting.",
+      "type": "object",
+      "properties": {
+        "jobId": { "type": "string" },
+        "jobTitle": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "rejected"], "default": "pending" },
+        "appliedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["jobId", "userId"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "A report filed against a user or a job posting.",
+      "type": "object",
+      "properties": {
+        "reportedBy": { "type": "string" },
+        "targetId": { "type": "string" },
+        "targetType": { "type": "string", "enum": ["user", "job"] },
+        "reason": { "type": "string" },
+        "details": { "type": "string" },
+        "status": { "type": "string", "enum": ["open", "resolved"], "default": "open" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["reportedBy", "targetId", "reason"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "A notification for a user.",
+      "type": "object",
+      "properties": {
+        "recipientId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["info", "success", "warning", "error"] },
+        "read": { "type": "boolean", "default": false },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["recipientId", "title", "message"]
+    }
+  },
+  "auth": {
+    "providers": ["email", "google"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Storage for user profile data."
+    },
+    "/jobs/{jobId}": {
+      "schema": "Job",
+      "description": "Storage for job postings. Accessible to all users for browsing."
+    },
+    "/applications/{applicationId}": {
+      "schema": "Application",
+      "description": "Storage for job applications."
+    },
+    "/reports/{reportId}": {
+      "schema": "Report",
+      "description": "Storage for moderation reports."
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "Storage for user notifications."
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Modern freelance workspace with laptop",
+      "imageUrl": "https://picsum.photos/seed/quub-hero/1200/800",
+      "imageHint": "freelance workspace"
+    },
+    {
+      "id": "avatar-1",
+      "description": "Professional female freelancer",
+      "imageUrl": "https://picsum.photos/seed/avatar1/200/200",
+      "imageHint": "professional woman"
+    },
+    {
+      "id": "avatar-2",
+      "description": "Young male designer",
+      "imageUrl": "https://picsum.photos/seed/avatar2/200/200",
+      "imageHint": "male designer"
+    },
+    {
+      "id": "avatar-3",
+      "description": "Tech entrepreneur",
+      "imageUrl": "https://picsum.photos/seed/avatar3/200/200",
+      "imageHint": "tech person"
+    },
+    {
+      "id": "project-1",
+      "description": "Mobile app UI design project",
+      "imageUrl": "https://picsum.photos/seed/project1/600/400",
+      "imageHint": "app design"
+    },
+    {
+      "id": "project-2",
+      "description": "Web development landing page",
+      "imageUrl": "https://picsum.photos/seed/project2/600/400",
+      "imageHint": "website coding"
+    }
+  ]
+}

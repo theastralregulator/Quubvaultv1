@@ -1,0 +1,41 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-mockup-1",
+      "description": "Quub App Dashboard Mockup",
+      "imageUrl": "https://picsum.photos/seed/mockup1/400/800",
+      "imageHint": "mobile dashboard"
+    },
+    {
+      "id": "hero-mockup-2",
+      "description": "Quub Worker Profile Mockup",
+      "imageUrl": "https://picsum.photos/seed/mockup2/400/800",
+      "imageHint": "worker profile"
+    },
+    {
+      "id": "avatar-group-1",
+      "description": "User Avatar 1",
+      "imageUrl": "https://picsum.photos/seed/user1/100/100",
+      "imageHint": "human face"
+    },
+    {
+      "id": "avatar-group-2",
+      "description": "User Avatar 2",
+      "imageUrl": "https://picsum.photos/seed/user2/100/100",
+      "imageHint": "human face"
+    },
+    {
+      "id": "avatar-group-3",
+      "description": "User Avatar 3",
+      "imageUrl": "https://picsum.photos/seed/user3/100/100",
+      "imageHint": "human face"
+    },
+    {
+      "id": "avatar-group-4",
+      "description": "User Avatar 4",
+      "imageUrl": "https://picsum.photos/seed/user4/100/100",
+      "imageHint": "human face"
+    }
+  ]
+}
