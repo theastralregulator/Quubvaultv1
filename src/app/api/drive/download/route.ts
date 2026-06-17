@@ -37,11 +37,13 @@ export async function GET(req: NextRequest) {
 
     const buffer = Buffer.from(fileResponse.data as ArrayBuffer);
 
+    const inline = searchParams.get('inline') === 'true';
+
     return new NextResponse(buffer, {
       status: 200,
       headers: {
         'Content-Type': mimeType,
-        'Content-Disposition': `attachment; filename="${encodeURIComponent(name)}"`,
+        'Content-Disposition': inline ? 'inline' : `attachment; filename="${encodeURIComponent(name)}"`,
         'Content-Length': buffer.length.toString(),
         'Cache-Control': 'private, no-store',
       },

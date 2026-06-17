@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useUser, useFirestore, useDoc, useCollection, useAuth } from '@/firebase';
-import { signOut } from 'firebase/auth';
+import { signOut, updateProfile } from 'firebase/auth';
 import { doc, query, collection, where, orderBy, limit, updateDoc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/use-memo-firebase';
 import { 
@@ -21,6 +21,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ProfileAvatar } from '@/components/ProfileAvatar';
+import { ProfileDropdown } from '@/components/ProfileDropdown';
+import { ChangeProfilePhotoModal } from '@/components/ChangeProfilePhotoModal';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,6 +59,39 @@ function TopNavbarContent({ onOpenMobileSidebar }: TopNavbarProps) {
 
   const [searchValue, setSearchValue] = useState(searchParams.get('search') || '');
   const [mounted, setMounted] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [localAvatarUrl, setLocalAvatarUrl] = useState<string | null>(null);
+
+  // Sync avatar from localStorage on startup
+  useEffect(() => {
+    if (user) {
+      const saved = localStorage.getItem(`quub_avatar_${user.uid}`);
+      if (saved) {
+        setLocalAvatarUrl(saved);
+      }
+    }
+  }, [user]);
+
+  const handleSaveAvatar = async (newPhotoUrl: string) => {
+    if (!user || !db) return;
+    
+    // 1. Update in Firestore
+    await updateDoc(doc(db, "users", user.uid), {
+      avatarUrl: newPhotoUrl
+    });
+
+    // 2. Update in Firebase Auth
+    await updateProfile(user, {
+      photoURL: newPhotoUrl
+    });
+
+    // 3. Save to localStorage
+    localStorage.setItem(`quub_avatar_${user.uid}`, newPhotoUrl);
+
+    // 4. Update local state
+    setLocalAvatarUrl(newPhotoUrl);
+  };
 
   // Sync state with URL params
   useEffect(() => {
@@ -237,45 +273,33 @@ function TopNavbarContent({ onOpenMobileSidebar }: TopNavbarProps) {
         </DropdownMenu>
 
         {/* User Profile Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2 px-2.5 py-1.5 h-10 rounded-xl hover:bg-white/[0.03] border border-white/5 bg-white/[0.01]">
-              <Avatar className="w-6.5 h-6.5 rounded-lg">
-                <AvatarImage src={profile?.avatarUrl || user?.photoURL || `https://picsum.photos/seed/${user?.uid}/100`} />
-                <AvatarFallback className="text-[10px] font-black bg-blue-600 text-white">{profile?.name?.[0] || 'U'}</AvatarFallback>
-              </Avatar>
-              <ChevronDown className="w-3.5 h-3.5 text-gray-500 hidden sm:block" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-slate-950 border border-white/10 text-white rounded-2xl p-2 shadow-2xl">
-            <div className="p-3">
-              <p className="text-xs font-bold truncate text-white">{profile?.name || "Vault User"}</p>
-              <p className="text-[10px] text-gray-500 truncate mt-0.5">{user?.email}</p>
-            </div>
-            <DropdownMenuSeparator className="bg-white/5" />
-            
-            <DropdownMenuItem asChild className="focus:bg-white/[0.05] rounded-xl cursor-pointer">
-              <Link href="/profile/me" className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider p-2 text-gray-300">
-                <UserIcon className="w-4 h-4 text-gray-500" /> View Profile
-              </Link>
-            </DropdownMenuItem>
-            
-            <DropdownMenuItem asChild className="focus:bg-white/[0.05] rounded-xl cursor-pointer">
-              <Link href="/dashboard/settings" className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider p-2 text-gray-300">
-                <Settings className="w-4 h-4 text-gray-500" /> Settings
-              </Link>
-            </DropdownMenuItem>
-            
-            <DropdownMenuSeparator className="bg-white/5" />
-            
-            <DropdownMenuItem 
-              onClick={handleSignOut}
-              className="focus:bg-rose-500/10 focus:text-rose-400 rounded-xl cursor-pointer text-xs font-bold uppercase tracking-wider p-2 text-gray-300 gap-2.5"
-            >
-              <LogOut className="w-4 h-4 text-rose-500" /> Sign Out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="relative flex items-center">
+          <ProfileAvatar
+            src={localAvatarUrl || profile?.avatarUrl || user?.photoURL}
+            fallbackText={profile?.name || user?.email || "U"}
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          />
+          <ProfileDropdown
+            isOpen={isDropdownOpen}
+            onClose={() => setIsDropdownOpen(false)}
+            profile={profile}
+            email={user?.email}
+            onChangePhotoClick={() => setIsModalOpen(true)}
+            onSignOut={handleSignOut}
+            usedStorage={usedStorage}
+            maxStorage={maxStorage}
+          />
+        </div>
+
+        {/* Change Profile Photo Modal */}
+        <ChangeProfilePhotoModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          currentPhotoUrl={localAvatarUrl || profile?.avatarUrl || user?.photoURL}
+          fallbackText={profile?.name || user?.email || "U"}
+          userId={user?.uid || ""}
+          onSave={handleSaveAvatar}
+        />
       </div>
     </header>
   );
