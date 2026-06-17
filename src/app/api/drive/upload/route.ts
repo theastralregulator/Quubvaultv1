@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDriveClient, DRIVE_FOLDER_ID } from '@/lib/drive';
+import { getDriveClient, DRIVE_FOLDER_ID, getFriendlyDriveError } from '@/lib/drive';
 import { Readable } from 'stream';
 
 export const runtime = 'nodejs';
@@ -65,8 +65,11 @@ export async function POST(req: NextRequest) {
       mimeType: driveFile.mimeType,
     });
   } catch (err: any) {
-    console.error('[Drive Upload Error]', err.message);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error('[Drive Upload Error]', err);
+    return NextResponse.json(
+      { error: getFriendlyDriveError(err, 'Upload service unavailable. Please try again later.') },
+      { status: 500 }
+    );
   }
 }
 

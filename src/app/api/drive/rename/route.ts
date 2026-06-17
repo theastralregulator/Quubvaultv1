@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDriveClient } from '@/lib/drive';
+import { getDriveClient, getFriendlyDriveError } from '@/lib/drive';
 
 export const runtime = 'nodejs';
 
@@ -27,7 +27,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    console.error('[Drive Rename Error]', err.message);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error('[Drive Rename Error]', err);
+    return NextResponse.json(
+      { error: getFriendlyDriveError(err, 'Rename service unavailable. Please try again later.') },
+      { status: 500 }
+    );
   }
 }

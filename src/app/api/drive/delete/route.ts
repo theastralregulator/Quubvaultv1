@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDriveClient } from '@/lib/drive';
+import { getDriveClient, getFriendlyDriveError } from '@/lib/drive';
 
 export const runtime = 'nodejs';
 
@@ -28,7 +28,10 @@ export async function POST(req: NextRequest) {
     if (err.code === 404 || err.status === 404) {
       return NextResponse.json({ success: true });
     }
-    console.error('[Drive Delete Error]', err.message);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error('[Drive Delete Error]', err);
+    return NextResponse.json(
+      { error: getFriendlyDriveError(err, 'Delete service unavailable. Please try again later.') },
+      { status: 500 }
+    );
   }
 }
